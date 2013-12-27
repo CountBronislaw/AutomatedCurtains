@@ -1,9 +1,9 @@
 /*
-*	MotorTest
-*	12/26/13
-*	Travis Carney
+* MotorTest
+* 12/26/13
+* Travis Carney
 *
-*	This is a demo program for controlling a stepper motor. It uses serial communication to accept commands and send responses back.
+* This is a demo program for controlling a stepper motor. It uses serial communication to accept commands and send responses back.
 */
 
 int mEnable = 11;		// Pin used to enable and disable the motor
@@ -13,7 +13,7 @@ String cmd = "";		// Contains the command
 char cmdChar;			// Contains individual characters that make up a command
 
 /*
-*	Setup serial communication, pin modes, set default states, and display prompt.
+* Setup serial communication, pin modes, set default states, and display prompt.
 */
 void setup(){
 	// Setup serial communication
@@ -32,7 +32,7 @@ void setup(){
 }
 
 /*
-*	Waits for incoming commands and runs the given command.
+* Waits for incoming commands and runs the given command.
 */
 void loop(){
 	// Wait for incoming data
@@ -78,15 +78,15 @@ void loop(){
 }
 
 /*
-*	Displays a message to the user.
+* Displays a message to the user.
 */
 void prompt(){
 	Serial.println("Please enter a motor command:");
 }
 
 /*
-*	Runs the motor for a given duration (in ms) in either a clockwise or counter-clockwise direction.
-*	Pass in HIGH for direction to go clockwise and LOW for direction to go counter-clockwise.
+* Runs the motor for a given duration (in ms) in either a clockwise or counter-clockwise direction.
+* Pass in HIGH for direction to go clockwise and LOW for direction to go counter-clockwise.
 */
 void runMotor(long duration, int direction){
 	long startTime = 0;  //	When the motor started running
@@ -106,9 +106,9 @@ void runMotor(long duration, int direction){
 }
 
 /*
-*	Enables and disables the motor.
-*	If enb is HIGH, the motor is disabled.
-*	If enb is LOW, the motor is enabled.
+* Enables and disables the motor.
+* If enb is HIGH, the motor is disabled.
+* If enb is LOW, the motor is enabled.
 */
 void enableMotor(int enb){
 	digitalWrite(mEnable, enb);
