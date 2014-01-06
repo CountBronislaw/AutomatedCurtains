@@ -15,7 +15,7 @@ HARDWARE
 
 A circuit diagram can be found in the arduino directory.
 
-SOFTWARAE
+SOFTWARE
 ===========
 
 To use the Arduino program, upload it to an Arduion Uno and connect an ethernet cable to the ethernet shield. To test ethernet communication, compile the udp_send_receive utility and send the 'status' command.
