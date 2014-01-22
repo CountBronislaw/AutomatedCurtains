@@ -23,6 +23,7 @@ IPAddress ip(192, 168, 2, 140);			// IP address of the arduino
 char packetBuff[UDP_TX_PACKET_MAX_SIZE];// Contains the incoming packet data
 char replyBuff[255];					// Contains the reply message
 EthernetUDP udp;						// EthernetUDP instance for sending and receiving data
+bool isMoving;							// Flag used to determine if the motor is active
 
 /*
 * Setup serial and ethernet communication, pin modes, set default states, and display prompt.
@@ -43,54 +44,63 @@ void setup() {
 	// Set default output states
 	digitalWrite(mEnable, HIGH);	// Disable the motor to prevent over-heating
 
+	// Default flags
+	isMoving = false;
+
 	// Display instructions
 	prompt();
 }
 
 /*
-* Waits for incoming commands and runs the given command.
+* Waits for incoming commands
 */
 void loop() {
 	// Wait for incoming data
 	int packetSize = udp.parsePacket();
 
-	if (packetSize) {
-		udp.read(packetBuff, UDP_TX_PACKET_MAX_SIZE);
-		IPAddress ip = udp.remoteIP();
-		int port = udp.remotePort();
+	if (packetSize)
+		parseCommand();
+}
 
-		// Enable the motor (EN == LOW)
-		if (strcmp(packetBuff, "on") == 0) { 
-			sendMessage("Enabling the motor...", ip, port);
-			enableMotor(LOW);
-		}
-		// Disable the motor (EN == HIGH)
-		else if (strcmp(packetBuff, "off") == 0) {  
-			sendMessage("Disabling the motor...", ip, port);
-			enableMotor(HIGH);
-		}
-		// Run the motor
-		else if (strcmp(packetBuff, "cw") == 0) {
-			sendMessage("Running the motor clock-wise...", ip, port);
-			runMotor(5000, HIGH);
-		}
-		else if (strcmp(packetBuff, "ccw") == 0) {
-			sendMessage("Running the motor counter clock-wise...", ip, port);
-			runMotor(5000, LOW);
-		}
-		// Report status
-		else if (strcmp(packetBuff, "status") == 0) {
-			getStatus();
-		}
-		// Unrecognized command
-		else {
-			sendMessage("Unrecognized command", ip, port);
-		}
+/*
+* Processes the incoming packet and calls the appropriate function.
+*/
+void parseCommand() {
+	udp.read(packetBuff, UDP_TX_PACKET_MAX_SIZE);
+	IPAddress ip = udp.remoteIP();
+	int port = udp.remotePort();
 
-		// Reset the packet buffer and prompt the user again
-		memset(packetBuff, 0, UDP_TX_PACKET_MAX_SIZE);
-		prompt();
+	// Enable the motor (EN == LOW)
+	if (strcmp(packetBuff, "on") == 0) { 
+		sendMessage("Enabling the motor...", ip, port);
+		enableMotor(LOW);
 	}
+	// Disable the motor (EN == HIGH)
+	else if (strcmp(packetBuff, "off") == 0) {  
+		sendMessage("Disabling the motor...", ip, port);
+		enableMotor(HIGH);
+	}
+	// Run the motor
+	else if (strcmp(packetBuff, "cw") == 0) {
+		sendMessage("Running the motor clock-wise...", ip, port);
+		runMotor(5000, HIGH);
+	}
+	else if (strcmp(packetBuff, "ccw") == 0) {
+		sendMessage("Running the motor counter clock-wise...", ip, port);
+		runMotor(5000, LOW);
+	}
+	// Report status
+	else if (strcmp(packetBuff, "status") == 0) {
+		getStatus();
+	}
+	// Unrecognized command
+	else {
+		sendMessage("Unrecognized command", ip, port);
+	}
+
+	// Reset the packet buffer and prompt the user again
+	memset(packetBuff, 0, UDP_TX_PACKET_MAX_SIZE);
+	prompt();
 }
 
 /*
@@ -109,14 +119,18 @@ void runMotor(long duration, int direction) {
 
 	// Check to see if the motor is disabled
 	if (digitalRead(mEnable) == 0){
+		isMoving = true;
 		startTime = millis();
 		digitalWrite(mDir, direction); // Set direction
+
 		while ((millis() - startTime) < duration) {
 			digitalWrite(mStep, HIGH);
 			delayMicroseconds(500);
 			digitalWrite(mStep, LOW);
 			delayMicroseconds(500);
 		}
+
+		isMoving = false;
 	}
 	else
 		sendMessage("Motor is disabled, cannot run.", udp.remoteIP(), udp.remotePort());
