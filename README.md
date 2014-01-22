@@ -25,11 +25,11 @@ COMMANDS
 
 This list will be updated as commands are added:
 
-on - Enables the motor
-off - Disables the motor
-cw - Runs the motor clockwise for 5 seconds
-ccw - Runs the motor counter-clockwise for 5 seconds
-status - Returns the current status of the motor
+- on - Enables the motor
+- off - Disables the motor
+- cw - Runs the motor clockwise for 5 seconds
+- ccw - Runs the motor counter-clockwise for 5 seconds
+- status - Returns the current status of the motor
 
 CONTACT
 ===========
